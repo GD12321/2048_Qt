@@ -22,10 +22,6 @@ void BoardWidget::paintEvent(QPaintEvent *)
     QRect rect = this->rect();
     int side = std::min(rect.width(), rect.height());
     int cellSide = side / 4;
-    QFont font = painter.font();
-    font.setPointSize(cellSide / 4);
-    font.setBold(true);
-    painter.setFont(font);
 
     painter.setRenderHint(QPainter::Antialiasing, true);
 
@@ -42,33 +38,47 @@ void BoardWidget::paintEvent(QPaintEvent *)
         for (int j = 0; j < 4; ++j) {
             int x = j * cellSide;
             int y = i * cellSide;
-            int value = grid[i][j];
+            int atomicNumber = grid[i][j];
 
             // 颜色
             QColor tileColor;
-            switch (value) {
+            switch (atomicNumber) {
             case 0: tileColor = QColor(205, 193, 180); break;
-            case 2: tileColor = QColor(238, 228, 218); break;
-            case 4: tileColor = QColor(237, 224, 200); break;
-            case 8: tileColor = QColor(242, 177, 121); break;
-            case 16: tileColor = QColor(245, 149, 99); break;
-            case 32: tileColor = QColor(246, 124, 95); break;
-            case 64: tileColor = QColor(246, 94, 59); break;
-            case 128: tileColor = QColor(237, 207, 114); break;
-            case 256: tileColor = QColor(237, 204, 97); break;
-            case 512: tileColor = QColor(237, 200, 80); break;
-            case 1024: tileColor = QColor(237, 197, 63); break;
-            case 2048: tileColor = QColor(237, 194, 46); break;
-            default: tileColor = QColor(60, 58, 50); break;
+            case 1: tileColor = QColor(238, 228, 218); break;
+            case 2: tileColor = QColor(237, 224, 200); break;
+            default:
+                tileColor = QColor(246 - std::min(atomicNumber * 5, 180), 177, 121); break;
             }
             painter.setBrush(tileColor);
             painter.setPen(Qt::NoPen);
             painter.drawRoundedRect(x + margin, y + margin, cellSide - 2 * margin, cellSide - 2 * margin, 10, 10);
 
-            // 数字
-            if (value) {
-                painter.setPen(value <= 4 ? QColor(119, 110, 101) : QColor(249, 246, 242));
-                painter.drawText(x, y, cellSide, cellSide, Qt::AlignCenter, QString::number(value));
+            // 字体调整
+            if (atomicNumber) {
+                // 大号字体显示元素符号
+                QFont font = painter.font();
+                font.setPointSize(cellSide / 3);
+                font.setBold(true);
+                painter.setFont(font);
+
+                QString elSymbol = QString::fromUtf8(Board::elementSymbol(atomicNumber));
+                painter.setPen(QColor(60, 58, 50));
+                int textH = cellSide / 2; // 顶部高度
+
+                painter.drawText(x, y + cellSide/6, cellSide, textH,
+                                 Qt::AlignHCenter | Qt::AlignVCenter, elSymbol);
+
+                // 小号字体显示质量（小数点两位）
+                font.setPointSize(cellSide / 7);
+                font.setBold(false);
+                painter.setFont(font);
+
+                double mass = Board::elementMass(atomicNumber);
+                QString massTxt = QString::number(mass, 'f', 2);
+
+                painter.setPen(QColor(120, 110, 100));
+                painter.drawText(x, y + cellSide * 3 / 5, cellSide, cellSide/3,
+                                 Qt::AlignHCenter | Qt::AlignTop, massTxt);
             }
         }
 }

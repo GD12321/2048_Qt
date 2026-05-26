@@ -9,6 +9,7 @@ public:
     bool isOver() const;
     int getScore() const;
     Board& getBoard();
+    void setScore(int s) { score = s; }
 private:
     Board board;
     int score;

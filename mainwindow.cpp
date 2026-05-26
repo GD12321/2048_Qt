@@ -9,6 +9,16 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    // === 顶端栏 Game 菜单 ===
+    menuBar_ = new QMenuBar(this);
+    gameMenu_ = new QMenu("游戏", this);
+    newGameAction_ = new QAction("开始游戏", this);
+    gameMenu_->addAction(newGameAction_);
+    menuBar_->addMenu(gameMenu_);
+    setMenuBar(menuBar_);
+
+    connect(newGameAction_, &QAction::triggered, this, &MainWindow::menuNewGame);
+
     QWidget *central = new QWidget(this);
     setCentralWidget(central);
 
@@ -45,6 +55,10 @@ MainWindow::MainWindow(QWidget *parent)
 void MainWindow::restartGame() {
     game.init();
     updateUI();
+}
+
+void MainWindow::menuNewGame() {
+    restartGame();
 }
 
 void MainWindow::updateUI() {

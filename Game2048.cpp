@@ -1,4 +1,5 @@
 #include "Game2048.h"
+#include <vector>
 
 Game2048::Game2048() {
     init();
@@ -10,16 +11,16 @@ void Game2048::init() {
 }
 
 bool Game2048::move(Direction dir) {
-    bool changed = board.move(dir);
+    // 新增：本回合合成产生的新块加总
+    std::vector<int> mergedList;
+    // 必须在Board中增加“记录本回合新合成块的原子序号”功能
+    bool changed = board.move(dir, &mergedList);
+
     if (changed) {
         board.addRandomTile();
-        // 重新统计分数（所有非0格求和，实际可根据实现而来）
-        int curScore = 0;
-        auto g = board.getGrid();
-        for (int i = 0; i < 4; ++i)
-            for (int j = 0; j < 4; ++j)
-                if (g[i][j]) curScore += g[i][j];
-        score = curScore;
+        for (int n: mergedList) {
+            score += n; // 每合成一个元素，分数加新元素的原子序
+        }
     }
     return changed;
 }
