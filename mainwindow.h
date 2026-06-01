@@ -6,6 +6,7 @@
 #include <QMenuBar>
 #include <QMenu>
 #include <QAction>
+#include <QStatusBar>
 #include "boardwidget.h"
 #include "Game2048.h"
 
@@ -17,18 +18,31 @@ public:
 protected:
     void keyPressEvent(QKeyEvent *event) override;
 private slots:
-    void restartGame();
     void menuNewGame();
+    void menuUndo();
+    void menuExit();
+    void menuInstructions();
+    void menuAbout();
+    void restartGame();
 private:
     BoardWidget *boardWidget;
     QLabel *scoreLabel;
     QPushButton *restartButton;
     Game2048 game;
 
-    // menu bar related
-    QMenuBar* menuBar_;
-    QMenu* gameMenu_;
-    QAction* newGameAction_;
+    // ── 菜单栏 ──
+    QMenuBar *menuBar_;
+    QMenu    *gameMenu_;
+    QAction  *newGameAction_;
+    QAction  *undoAction_;
+    QAction  *exitAction_;
+
+    QMenu    *helpMenu_;
+    QAction  *instructionsAction_;
+    QAction  *aboutAction_;
+
+    // ── 状态栏 ──
+    QLabel   *highScoreLabel;
 
     void updateUI();
     void handleMove(Direction dir);
