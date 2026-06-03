@@ -1,17 +1,9 @@
 #include "Board.h"
+#include "ElementData.h"
 #include <cstdlib>
 #include <ctime>
 #include <vector>
 #include <cmath>
-
-static const ElementInfo kElements[] = {
-    {"", 0.0},
-    {"H", 1.01}, {"He", 4.00}, {"Li", 6.94}, {"Be", 9.01},
-    {"B", 10.81}, {"C", 12.01}, {"N", 14.01}, {"O", 16.00},
-    {"F", 19.00}, {"Ne", 20.18},{"Na", 22.99}, {"Mg", 24.31},
-    {"Al", 26.98}, {"Si", 28.09}, {"P", 30.97}, {"S", 32.07},
-    {"Cl", 35.45},{"Ar", 39.95},{"K", 39.10},{"Ca", 40.08}
-};
 
 Board::Board() { reset(); }
 
@@ -51,7 +43,7 @@ bool Board::slideAndMerge(int line[4], std::vector<int>* merged) {
     std::vector<int> temp;
     for (int i = 0; i < 4; ++i)
         if (line[i]) temp.push_back(line[i]);
-    bool changed = temp.size() != 4;
+    bool changed = false;
     for (int i = 0; i + 1 < temp.size(); ++i) {
         if (temp[i] == temp[i + 1]) {
             temp[i] += 1; // 合成新元素
@@ -117,20 +109,13 @@ bool Board::canMove() const {
     return false;
 }
 
-const ElementInfo* Board::getElementTable(int &count) {
-    count = sizeof(kElements)/sizeof(ElementInfo);
-    return kElements;
-}
-
 const char* Board::elementSymbol(int atomicNumber) {
-    int size = sizeof(kElements)/sizeof(ElementInfo);
-    if (atomicNumber >= 0 && atomicNumber < size)
-        return kElements[atomicNumber].symbol;
+    if (atomicNumber >= 0 && atomicNumber < kElementCount)
+        return kElementDetails[atomicNumber].symbol;
     return "";
 }
 double Board::elementMass(int atomicNumber) {
-    int size = sizeof(kElements)/sizeof(ElementInfo);
-    if (atomicNumber >= 0 && atomicNumber < size)
-        return kElements[atomicNumber].mass;
+    if (atomicNumber >= 0 && atomicNumber < kElementCount)
+        return kElementDetails[atomicNumber].mass;
     return 0.0;
 }

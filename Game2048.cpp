@@ -11,6 +11,7 @@ void Game2048::init() {
     board.reset();
     score = 0;
     hasUndoState = false;
+    lastMerged.clear();
 }
 
 bool Game2048::move(Direction dir) {
@@ -20,6 +21,7 @@ bool Game2048::move(Direction dir) {
     if (changed) {
         saveUndoState();
         board.addRandomTile();
+        lastMerged = mergedList;   // 供周期表查询
         for (int n: mergedList) {
             score += n;
         }

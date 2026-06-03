@@ -27,9 +27,14 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Board.h
         Game2048.h
         boardwidget.h
+        PeriodicTable.h
+        ElementDialog.h
+        ElementData.h
         Board.cpp
         Game2048.cpp
         boardwidget.cpp
+        PeriodicTable.cpp
+        ElementDialog.cpp
 
     )
 # Define target properties for Android with Qt 6 as:

@@ -1,6 +1,7 @@
 #pragma once
 #include "Board.h"
 #include <QSettings>
+#include <vector>
 
 class Game2048 {
 public:
@@ -16,6 +17,8 @@ public:
     bool canUndo() const;
     void undo();               // 撤销上一步
 
+    const std::vector<int>& getLastMerged() const { return lastMerged; }
+
 private:
     Board board;
     int score;
@@ -25,6 +28,9 @@ private:
     bool hasUndoState = false;
     int  undoGrid[4][4];
     int  undoScore;
+
+    // 本回合合成的新元素（供周期表使用）
+    std::vector<int> lastMerged;
 
     void saveUndoState();
     void loadHighScore();
