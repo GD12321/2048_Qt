@@ -32,7 +32,6 @@ private:
     // 本回合合成的新元素（供周期表使用）
     std::vector<int> lastMerged;
 
-    void saveUndoState();
     void loadHighScore();
     void saveHighScore();
 };

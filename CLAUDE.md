@@ -29,7 +29,7 @@ Five-layer design:
 |---|---|---|
 | Shared data | `ElementData.h` | Static `kElementDetails[21]` (0=empty, 1=H … 20=Ca). Each entry: symbol, Chinese/English name, mass, category, electron config, tile color. Single source of truth — Board, BoardWidget, PeriodicTable, and ElementDialog all reference this table. |
 | Data | `Board.h/.cpp` | 4×4 grid of atomic numbers. Pure logic: `slideAndMerge()` per row/column with merged-element tracking (`mergedList`), random tile spawn (H 90%, He 10%), `canMove()` check. `elementSymbol()` and `elementMass()` delegate to `ElementData.h`. |
-| Game state | `Game2048.h/.cpp` | Wraps `Board` with score, single-level undo (`memcpy` snapshot before each move), high-score persistence via `QSettings("MySoft", "2048")`. Exposes `lastMerged` (newly created elements this move) for the periodic table. |
+| Game state | `Game2048.h/.cpp` | Wraps `Board` with score, single-level undo, high-score persistence via `QSettings("MySoft", "2048")`. Exposes `lastMerged` (newly created elements this move) for the periodic table. Undo snapshot is only taken when a move actually changes the board — no-op moves (direction blocked) don't overwrite the undo state. |
 | UI | `mainwindow.h/.cpp` | Left-right layout: board widget (fixed 420×420) + right panel (140px). Right panel: two score cards (`QFrame`), undo/restart buttons. Menu bar: 游戏 / 查看 / 帮助. Keyboard: arrows+WASD → `Direction`; Ctrl+Z → undo; Ctrl+T → periodic table. Window fixed 600×480. |
 | Rendering | `boardwidget.h/.cpp` | `QPainter` widget. Tile colors from `kElementDetails[].tileColor`. Rounded rect (`borderRadius=8`) with margin `cellSide/16`. Element symbol bold (large), mass below (small). Light tiles (H, He) get dark text; darker tiles get white text. |
 | Periodic table | `PeriodicTable.h/.cpp` | Non-modal QDialog, 18-column × 4-row authentic layout. Tracks discovered elements via `QSet<int>` persisted to `QSettings`. Undiscovered cells show atomic number in gray; discovered cells light up in element color. Click → opens `ElementDialog`. |
@@ -61,7 +61,7 @@ Grid cells are chemical elements, not numbers. Two identical elements merge into
 
 ## Undo model
 
-Single-level: `Game2048::saveUndoState()` copies the grid via `memcpy` + saves `score` before each successful move. `undo()` restores via `Board::setGrid()`. Undo state is cleared after restoring (no redo).
+Single-level: before each move, `Game2048::move()` snapshots the grid and score into a local temp. If `Board::move()` reports a change, the temp is promoted to `undoGrid`/`undoScore` and `hasUndoState = true`. If the move was a no-op, the temp is discarded — the previous valid undo state stays intact. `undo()` restores via `Board::setGrid()` and clears `hasUndoState` (no redo). No separate `saveUndoState()` method; the capture-and-promote logic is inline in `move()`.
 
 ## Agent skills
 

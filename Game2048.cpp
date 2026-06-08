@@ -16,10 +16,20 @@ void Game2048::init() {
 
 bool Game2048::move(Direction dir) {
     std::vector<int> mergedList;
+
+    // 先暂存移动前的状态，只有移动确实改变了棋盘时才提升为撤销点
+    int preMoveGrid[4][4];
+    std::memcpy(preMoveGrid, board.getGrid(), sizeof(preMoveGrid));
+    int preMoveScore = score;
+
     bool changed = board.move(dir, &mergedList);
 
     if (changed) {
-        saveUndoState();
+        // 移动成功 — 将移动前的状态保存为撤销点
+        std::memcpy(undoGrid, preMoveGrid, sizeof(undoGrid));
+        undoScore = preMoveScore;
+        hasUndoState = true;
+
         board.addRandomTile();
         lastMerged = mergedList;   // 供周期表查询
         for (int n: mergedList) {
@@ -50,13 +60,6 @@ Board& Game2048::getBoard() {
 }
 
 // -- Undo --
-
-void Game2048::saveUndoState() {
-    const int (*g)[4] = board.getGrid();
-    std::memcpy(undoGrid, g, sizeof(undoGrid));
-    undoScore = score;
-    hasUndoState = true;
-}
 
 bool Game2048::canUndo() const {
     return hasUndoState;
